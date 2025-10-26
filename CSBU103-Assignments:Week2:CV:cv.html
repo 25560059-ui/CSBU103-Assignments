@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<!-- Khai báo loại tài liệu HTML5 -->
+<html lang="vi">
+  <head>
+    <!-- Thẻ meta khai báo bảng mã tiếng Việt -->
+    <meta charset="UTF-8" />
+    <!-- Thông tin tác giả -->
+    <meta name="author" content="Hoàng Phạm Ngọc Trí" />
+    <!-- Mô tả nội dung trang web -->
+    <meta name="description" content="CV sinh viên - Hoàng Phạm Ngọc Trí" />
+    <!-- Từ khóa giúp tối ưu tìm kiếm -->
+    <meta name="keywords" content="CV, sinh viên, uit, HTML" />
+    <!-- Tiêu đề hiển thị trên tab trình duyệt -->
+    <title>CV - Hoàng Phạm Ngọc Trí</title>
+
+    <!-- Phần CSS nội tuyến để định dạng trang CV -->
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #36e2d9;
+        margin: 0;
+        padding: 0;
+      }
+
+      .container {
+        display: flex;
+        flex-direction: row;
+        max-width: 900px;
+        margin: 20px auto;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .left {
+        background-color: #f3f8c9;
+        width: 35%;
+        padding: 25px;
+        color: #333;
+      }
+
+      .left img {
+        display: block;
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        margin: 0 auto 15px;
+        object-fit: cover;
+      }
+
+      .left h3 {
+        background-color: #f38b8b;
+        color: white;
+        padding: 6px 10px;
+        border-radius: 5px;
+        font-size: 16px;
+      }
+
+      .left p,
+      .left li {
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      .left ul {
+        list-style: none;
+        padding-left: 10px;
+      }
+
+      .right {
+        width: 65%;
+        padding: 30px;
+      }
+
+      .name {
+        text-align: left;
+        border-bottom: 2px solid #e23636;
+        padding-bottom: 5px;
+        margin-bottom: 15px;
+      }
+
+      .name h1 {
+        margin: 0;
+        color: #e23636;
+      }
+
+      /* Phần tiêu đề từng mục */
+      .section {
+        margin-bottom: 25px;
+      }
+
+      .section h2 {
+        color: #e23636;
+        border-bottom: 2px solid #e23636;
+        padding-bottom: 5px;
+        font-size: 20px;
+      }
+
+      .section p,
+      .section li {
+        font-size: 14px;
+        line-height: 1.6;
+      }
+
+      .icon {
+        color: #e23636;
+        font-weight: bold;
+      }
+
+      .stars {
+        color: #e23636;
+      }
+
+      footer {
+        text-align: center;
+        padding: 15px;
+        background-color: #f8c9c9;
+        font-size: 13px;
+        color: #333;
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- DIV container chính chứa 2 cột -->
+    <div class="container">
+      <!-- CỘT TRÁI: thông tin cá nhân, kỹ năng, học vấn -->
+      <div class="left">
+        <!-- Ảnh đại diện -->
+        <img
+          src="https://vn1.vdrive.vn/alohamedia.vn/2025/05/Anh-chan-dung-dang-khoanh-tay.jpg"
+          alt="Ảnh Hoàng Phạm Ngọc Trí"
+        />
+
+        <!-- Mục: Liên hệ -->
+        <h3>LIÊN HỆ</h3>
+        <!-- Dùng <p> để hiển thị thông tin liên hệ ngắn -->
+        <p>
+          📧 uit41@gmail.com<br />
+          📞 0912345678<br />
+        </p>
+
+        <!-- Mục tiêu nghề nghiệp -->
+        <h3>MỤC TIÊU NGHỀ NGHIỆP</h3>
+        <!-- Danh sách các mục tiêu sử dụng <ul> và <li> -->
+        <ul>
+          <li>Mong muốn tìm được chỗ làm ổn định lâu dài</li>
+          <li>Mong muốn tìm được chỗ làm có cơ hội thăng tiến tốt</li>
+          <li>Mong muốn tìm được chỗ làm có mức lương tốt</li>
+        </ul>
+
+        <!-- Kỹ năng cá nhân -->
+        <h3>KỸ NĂNG</h3>
+        <ul>
+          <li>Kỹ năng giao tiếp</li>
+          <li>Làm việc nhóm</li>
+          <li>Dễ dàng thích nghi với môi trường mới</li>
+          <li>Lập kế hoạch</li>
+          <li>Giải quyết vấn đề</li>
+        </ul>
+
+        <!-- Tin học văn phòng -->
+        <h3>TIN HỌC</h3>
+        <!-- Sử dụng ký tự ★ để hiển thị mức độ thành thạo -->
+        <p>
+          Ms Word: <span class="stars">★★★★★</span><br />
+          Ms Excel: <span class="stars">★★★☆☆</span><br />
+          Ms PowerPoint: <span class="stars">★★★★☆</span>
+        </p>
+
+        <!-- Ngoại ngữ -->
+        <h3>NGOẠI NGỮ</h3>
+        <p>
+          Tiếng Anh: <span class="stars">★★★☆☆</span><br />
+          Tiếng Trung: <span class="stars">★☆☆☆☆</span>
+        </p>
+
+        <!-- Giải thưởng đạt được -->
+        <h3>GIẢI THƯỞNG</h3>
+        <p>
+          Sinh viên nghiên cứu khoa học năm 2027<br />
+          Trường Đại học UIT
+        </p>
+
+        <!-- Chứng chỉ -->
+        <h3>CHỨNG CHỈ</h3>
+        <p>Chứng chỉ ngoại ngữ: IELTS 6.0</p>
+      </div>
+
+      <!-- CỘT PHẢI: học vấn, kinh nghiệm, sở thích -->
+      <div class="right">
+        <!-- Phần tiêu đề tên ứng viên -->
+        <div class="name">
+          <h1>Hoàng Phạm Ngọc Trí</h1>
+          <p><i>Sinh viên mới ra trường</i></p>
+        </div>
+
+        <!-- Phần học vấn -->
+        <div class="section">
+          <h2>🎓 Học vấn</h2>
+          <!-- Dùng <p> để hiển thị chi tiết học vấn -->
+          <p>
+            <b>10/2022 - 06/2025</b> — <b>Trường THPT Nguyễn Hữu Cầu</b>
+            <br />
+            Xếp loại: GIỎI<br />
+          </p>
+          <p>
+            <b>10/2025 - 06/2029</b> — <b>CỬ NHÂN KHOA HỌC MÁY TÍNH</b><br />
+            Trường: Đại học công nghệ thông tin<br />
+            Xếp loại: GIỎI<br />
+
+            Ngành: Khoa học máy tính
+          </p>
+        </div>
+
+        <!-- Kinh nghiệm làm việc -->
+        <div class="section">
+          <h2>Ngôn ngữ lập trình</h2>
+
+          <!-- Liệt kê công việc đã làm bằng danh sách <ul> -->
+          <ul>
+            <li>C</li>
+            <li>JAVA</li>
+            <li>HTML</li>
+          </ul>
+        </div>
+
+        <!-- Sở thích -->
+        <div class="section">
+          <h2>❤️ Sở thích</h2>
+          <ul>
+            <li>Đá banh</li>
+            <li>Chơi game</li>
+            <li>Đọc sách</li>
+          </ul>
+        </div>
+
+        <!-- Mentor -->
+        <div class="section">
+          <h2>📞 MENTOR</h2>
+          <p>
+            <b>Thầy Nguyễn Văn Tùng</b> – Khoa KHMT <br />
+            Email: vantunguit@gmail.com<br />
+            SĐT: 0987434321
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chân trang -->
+    <footer>© 2025 Hoàng Phạm Ngọc Trí | Sinh viên Đại học UIT</footer>
+  </body>
+</html>
