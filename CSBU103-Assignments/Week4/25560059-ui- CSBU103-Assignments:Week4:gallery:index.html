@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Photo Gallery Viewer</title>
+    <style>
+      :root {
+        --bg: #0f1216;
+        --panel: #171b21;
+        --text: #e7edf3;
+        --muted: #a9b3bd;
+        --accent: #4ea1ff;
+        --accent-2: #7c5cff;
+        --border: #2a313a;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: linear-gradient(120deg, var(--bg), #12161b 60%, #0c0f13);
+        color: var(--text);
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto,
+          "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
+      }
+
+      header {
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--border);
+        background: rgba(23, 27, 33, 0.6);
+        backdrop-filter: blur(6px);
+        position: sticky;
+        top: 0;
+        z-index: 10;
+      }
+      header .row {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 12px;
+        align-items: center;
+      }
+      h1 {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 600;
+        letter-spacing: 0.2px;
+      }
+
+      .controls {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      .controls input[type="text"] {
+        width: clamp(220px, 30vw, 480px);
+        padding: 10px 12px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        background: var(--panel);
+        color: var(--text);
+        outline: none;
+      }
+      .controls input[type="file"] {
+        display: none;
+      }
+      .btn,
+      label.btn {
+        padding: 10px 12px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        background: linear-gradient(180deg, #1b2027, #151a20);
+        color: var(--text);
+        cursor: pointer;
+        font-weight: 600;
+      }
+      .btn.primary {
+        background: linear-gradient(180deg, var(--accent), var(--accent-2));
+        border: none;
+        color: white;
+      }
+
+      main {
+        padding: 18px;
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+
+      /* Responsive grid */
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 12px;
+      }
+      .card {
+        background: #12161c;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        overflow: hidden;
+        position: relative;
+        transition: transform 120ms ease, box-shadow 120ms ease;
+      }
+      .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+      }
+      .thumb {
+        width: 100%;
+        aspect-ratio: 4/3;
+        object-fit: cover;
+        display: block;
+        background: #0b0e12;
+      }
+      .caption {
+        font-size: 12px;
+        color: var(--muted);
+        padding: 8px 10px;
+        border-top: 1px solid var(--border);
+      }
+      .badge {
+        position: absolute;
+        top: 8px;
+        left: 8px;
+        background: rgba(0, 0, 0, 0.45);
+        color: #fff;
+        font-size: 11px;
+        padding: 4px 8px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        backdrop-filter: blur(6px);
+      }
+
+      /* Lightbox viewer */
+      .lightbox {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.8);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 100;
+        padding: 24px;
+      }
+      .lightbox.open {
+        display: flex;
+      }
+      .viewer {
+        max-width: min(92vw, 1200px);
+        max-height: 86vh;
+        position: relative;
+        background: #0d1117;
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        overflow: hidden;
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+      }
+      .viewer img {
+        max-width: 100%;
+        max-height: 72vh;
+        object-fit: contain;
+        background: #0b0e12;
+      }
+      .viewer header,
+      .viewer footer {
+        padding: 10px 14px;
+        font-size: 13px;
+        color: var(--muted);
+        border-bottom: 1px solid var(--border);
+      }
+      .viewer footer {
+        border-top: 1px solid var(--border);
+        border-bottom: none;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .viewer .title {
+        color: var(--text);
+        font-weight: 600;
+      }
+      .actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .actions .btn {
+        font-size: 13px;
+      }
+      .nav {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        pointer-events: none;
+      }
+      .nav .arrow {
+        pointer-events: auto;
+        width: 44px;
+        height: 44px;
+        border-radius: 999px;
+        display: grid;
+        place-items: center;
+        background: rgba(0, 0, 0, 0.35);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        margin: 12px;
+        cursor: pointer;
+        user-select: none;
+        font-weight: 700;
+      }
+      .close {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        pointer-events: auto;
+        width: 40px;
+        height: 40px;
+        border-radius: 999px;
+        display: grid;
+        place-items: center;
+        background: rgba(0, 0, 0, 0.45);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        cursor: pointer;
+        user-select: none;
+        font-weight: 700;
+      }
+
+      /* Drop zone */
+      .dropzone {
+        margin: 0 18px 18px;
+        padding: 14px;
+        border: 2px dashed var(--border);
+        border-radius: 12px;
+        color: var(--muted);
+        text-align: center;
+      }
+      .dropzone.highlight {
+        border-color: var(--accent);
+        color: var(--text);
+      }
+      .note {
+        font-size: 12px;
+        color: var(--muted);
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="row">
+        <h1>Photo Gallery Viewer</h1>
+        <div class="controls">
+          <input
+            id="urlInput"
+            type="text"
+            placeholder="Paste an image URL (https://...)"
+          />
+          <button id="addUrlBtn" class="btn primary">Add URL</button>
+          <label for="fileInput" class="btn">Upload local files</label>
+          <input id="fileInput" type="file" accept="image/*" multiple />
+        </div>
+      </div>
+    </header>
+
+    <div id="dropzone" class="dropzone">
+      Drag & drop images here, or use “Upload local files”. You can also paste
+      online URLs.
+      <div class="note">
+        Tip: To use local images without uploading, place them in the same
+        folder and add their file paths.
+      </div>
+    </div>
+
+    <main>
+      <div id="grid" class="grid"></div>
+    </main>
+
+    <!-- Lightbox -->
+    <div id="lightbox" class="lightbox" aria-hidden="true">
+      <div class="viewer">
+        <header>
+          <span class="title" id="viewerTitle">Image</span>
+        </header>
+        <img id="viewerImg" src="" alt="" />
+        <footer>
+          <div class="actions">
+            <button id="downloadBtn" class="btn">Download</button>
+            <button id="openBtn" class="btn">Open in new tab</button>
+          </div>
+          <div id="counter" class="note">0 / 0</div>
+        </footer>
+        <div class="nav">
+          <div id="prevBtn" class="arrow" aria-label="Previous">‹</div>
+          <div id="nextBtn" class="arrow" aria-label="Next">›</div>
+        </div>
+        <div id="closeBtn" class="close" aria-label="Close">×</div>
+      </div>
+    </div>
+
+    <script>
+      // Sample images (online URLs). Replace or append local file paths (e.g., "images/photo1.jpg").
+      const initialImages = [
+        {
+          src: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?q=80&w=1600&auto=format&fit=crop",
+          title: "Desert Dunes",
+        },
+        {
+          src: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1600&auto=format&fit=crop",
+          title: "Mountain Lake",
+        },
+        {
+          src: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1600&auto=format&fit=crop",
+          title: "Forest Light",
+        },
+        {
+          src: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=1600&auto=format&fit=crop",
+          title: "Golden Field",
+        },
+        {
+          src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1600&auto=format&fit=crop",
+          title: "Ocean Waves",
+        },
+        {
+          src: "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?q=80&w=1600&auto=format&fit=crop",
+          title: "Snowy Peak",
+        },
+      ];
+
+      const state = {
+        images: [...initialImages],
+        currentIndex: 0,
+      };
+
+      const grid = document.getElementById("grid");
+      const urlInput = document.getElementById("urlInput");
+      const addUrlBtn = document.getElementById("addUrlBtn");
+      const fileInput = document.getElementById("fileInput");
+      const dropzone = document.getElementById("dropzone");
+
+      const lightbox = document.getElementById("lightbox");
+      const viewerImg = document.getElementById("viewerImg");
+      const viewerTitle = document.getElementById("viewerTitle");
+      const prevBtn = document.getElementById("prevBtn");
+      const nextBtn = document.getElementById("nextBtn");
+      const closeBtn = document.getElementById("closeBtn");
+      const counter = document.getElementById("counter");
+      const downloadBtn = document.getElementById("downloadBtn");
+      const openBtn = document.getElementById("openBtn");
+
+      function renderGrid() {
+        grid.innerHTML = "";
+        state.images.forEach((img, idx) => {
+          const card = document.createElement("div");
+          card.className = "card";
+          card.innerHTML = `
+          <img class="thumb" src="${img.src}" alt="${
+            img.title || "Image"
+          }" loading="lazy"/>
+          <div class="caption">${img.title || "Untitled"}</div>
+          <div class="badge">${isUrl(img.src) ? "URL" : "Local"}</div>
+        `;
+          card.addEventListener("click", () => openViewer(idx));
+          grid.appendChild(card);
+        });
+      }
+
+      function isUrl(str) {
+        try {
+          return new URL(str), true;
+        } catch {
+          return false;
+        }
+      }
+
+      function openViewer(index) {
+        state.currentIndex = index;
+        const item = state.images[index];
+        viewerImg.src = item.src;
+        viewerTitle.textContent = item.title || "Image";
+        counter.textContent = index + 1 + " / " + state.images.length;
+        lightbox.classList.add("open");
+        lightbox.setAttribute("aria-hidden", "false");
+        document.body.style.overflow = "hidden";
+      }
+
+      function closeViewer() {
+        lightbox.classList.remove("open");
+        lightbox.setAttribute("aria-hidden", "true");
+        document.body.style.overflow = "";
+      }
+
+      function next() {
+        const n = (state.currentIndex + 1) % state.images.length;
+        openViewer(n);
+      }
+      function prev() {
+        const p =
+          (state.currentIndex - 1 + state.images.length) % state.images.length;
+        openViewer(p);
+      }
+
+      function addImage(src, title) {
+        if (!src) return;
+        state.images.push({ src, title });
+        renderGrid();
+      }
+
+      // Add URL via input
+      addUrlBtn.addEventListener("click", () => {
+        const val = urlInput.value.trim();
+        if (!val) return;
+        addImage(val, "Added URL");
+        urlInput.value = "";
+      });
+
+      // Support pressing Enter in URL input
+      urlInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") addUrlBtn.click();
+      });
+
+      // Local file input
+      fileInput.addEventListener("change", (e) => {
+        const files = Array.from(e.target.files || []);
+        files.forEach((file) => {
+          const url = URL.createObjectURL(file); // ephemeral object URL
+          addImage(url, file.name);
+        });
+        fileInput.value = "";
+      });
+
+      // Drag & drop
+      ["dragenter", "dragover"].forEach((eventName) => {
+        dropzone.addEventListener(eventName, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          dropzone.classList.add("highlight");
+        });
+      });
+      ["dragleave", "drop"].forEach((eventName) => {
+        dropzone.addEventListener(eventName, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          dropzone.classList.remove("highlight");
+        });
+      });
+      dropzone.addEventListener("drop", (e) => {
+        const items = e.dataTransfer.items || [];
+        for (const item of items) {
+          if (item.kind === "file") {
+            const file = item.getAsFile();
+            if (file && file.type.startsWith("image/")) {
+              const url = URL.createObjectURL(file);
+              addImage(url, file.name);
+            }
+          } else if (item.kind === "string" && item.type === "text/uri-list") {
+            item.getAsString((str) => addImage(str, "Dropped URL"));
+          }
+        }
+        // Fallback: plain files via dataTransfer.files
+        const files = Array.from(e.dataTransfer.files || []);
+        files.forEach((file) => {
+          if (file.type.startsWith("image/")) {
+            const url = URL.createObjectURL(file);
+            addImage(url, file.name);
+          }
+        });
+      });
+
+      // Lightbox actions
+      nextBtn.addEventListener("click", next);
+      prevBtn.addEventListener("click", prev);
+      closeBtn.addEventListener("click", closeViewer);
+      lightbox.addEventListener("click", (e) => {
+        if (e.target === lightbox) closeViewer();
+      });
+      document.addEventListener("keydown", (e) => {
+        if (!lightbox.classList.contains("open")) return;
+        if (e.key === "Escape") closeViewer();
+        if (e.key === "ArrowRight") next();
+        if (e.key === "ArrowLeft") prev();
+      });
+
+      // Open in new tab / download
+      openBtn.addEventListener("click", () => {
+        const item = state.images[state.currentIndex];
+        window.open(item.src, "_blank", "noopener");
+      });
+      downloadBtn.addEventListener("click", () => {
+        const item = state.images[state.currentIndex];
+        const a = document.createElement("a");
+        a.href = item.src;
+        a.download = (item.title || "image").replace(/\s+/g, "_");
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      });
+
+      // Initial render
+      renderGrid();
+    </script>
+  </body>
+</html>
