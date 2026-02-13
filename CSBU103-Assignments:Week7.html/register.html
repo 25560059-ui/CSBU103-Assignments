@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Registration</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            max-width: 450px;
+            width: 100%;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="email"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .error {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .error.show {
+            display: block;
+        }
+
+        input.invalid {
+            border-color: #e74c3c;
+        }
+
+        input.valid {
+            border-color: #2ecc71;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-submit:active {
+            transform: translateY(0);
+        }
+
+        .btn-submit:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .success-message {
+            background: #2ecc71;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        .password-requirements {
+            font-size: 13px;
+            color: #666;
+            margin-top: 5px;
+            line-height: 1.6;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+        }
+
+        .login-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Create Account</h2>
+        
+        <div class="success-message" id="successMessage">
+            Registration successful! Redirecting to login...
+        </div>
+
+        <form id="registrationForm">
+            <div class="form-group">
+                <label for="username">Email Address</label>
+                <input type="email" id="username" name="username" placeholder="Enter your email">
+                <div class="error" id="usernameError">Please enter a valid email address</div>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Enter your password">
+                <div class="password-requirements">
+                    Must be at least 6 characters and contain at least 1 number and 1 special character
+                </div>
+                <div class="error" id="passwordError">Password does not meet requirements</div>
+            </div>
+
+            <div class="form-group">
+                <label for="confirmPassword">Confirm Password</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Re-enter your password">
+                <div class="error" id="confirmPasswordError">Passwords do not match</div>
+            </div>
+
+            <button type="submit" class="btn-submit">Register</button>
+        </form>
+
+        <div class="login-link">
+            Already have an account? <a href="login.html">Login here</a>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Email validation regex
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            
+            // Password validation regex (at least 6 chars, 1 number, 1 special char)
+            const passwordRegex = /^(?=.*[0-9])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{6,}$/;
+
+            let isUsernameValid = false;
+            let isPasswordValid = false;
+            let isConfirmPasswordValid = false;
+
+            // Validate username (email)
+            $('#username').on('blur keyup', function() {
+                const username = $(this).val().trim();
+                
+                if (username === '') {
+                    $(this).removeClass('valid invalid');
+                    $('#usernameError').removeClass('show');
+                    isUsernameValid = false;
+                } else if (emailRegex.test(username)) {
+                    $(this).removeClass('invalid').addClass('valid');
+                    $('#usernameError').removeClass('show');
+                    isUsernameValid = true;
+                } else {
+                    $(this).removeClass('valid').addClass('invalid');
+                    $('#usernameError').addClass('show');
+                    isUsernameValid = false;
+                }
+            });
+
+            // Validate password
+            $('#password').on('blur keyup', function() {
+                const password = $(this).val();
+                
+                if (password === '') {
+                    $(this).removeClass('valid invalid');
+                    $('#passwordError').removeClass('show');
+                    isPasswordValid = false;
+                } else if (passwordRegex.test(password)) {
+                    $(this).removeClass('invalid').addClass('valid');
+                    $('#passwordError').removeClass('show');
+                    isPasswordValid = true;
+                } else {
+                    $(this).removeClass('valid').addClass('invalid');
+                    $('#passwordError').addClass('show');
+                    isPasswordValid = false;
+                }
+
+                // Re-validate confirm password if it has a value
+                if ($('#confirmPassword').val() !== '') {
+                    $('#confirmPassword').trigger('keyup');
+                }
+            });
+
+            // Validate confirm password
+            $('#confirmPassword').on('blur keyup', function() {
+                const password = $('#password').val();
+                const confirmPassword = $(this).val();
+                
+                if (confirmPassword === '') {
+                    $(this).removeClass('valid invalid');
+                    $('#confirmPasswordError').removeClass('show');
+                    isConfirmPasswordValid = false;
+                } else if (password === confirmPassword && passwordRegex.test(password)) {
+                    $(this).removeClass('invalid').addClass('valid');
+                    $('#confirmPasswordError').removeClass('show');
+                    isConfirmPasswordValid = true;
+                } else {
+                    $(this).removeClass('valid').addClass('invalid');
+                    $('#confirmPasswordError').addClass('show');
+                    isConfirmPasswordValid = false;
+                }
+            });
+
+            // Handle form submission
+            $('#registrationForm').on('submit', function(e) {
+                e.preventDefault();
+
+                // Trigger validation on all fields
+                $('#username').trigger('blur');
+                $('#password').trigger('blur');
+                $('#confirmPassword').trigger('blur');
+
+                // Check if all validations pass
+                if (!isUsernameValid || !isPasswordValid || !isConfirmPasswordValid) {
+                    return false;
+                }
+
+                // Get form data
+                const formData = {
+                    username: $('#username').val().trim(),
+                    password: $('#password').val()
+                };
+
+                // Disable submit button
+                $('.btn-submit').prop('disabled', true).text('Registering...');
+
+                // Send AJAX request to backend
+                $.ajax({
+                    url: '/api/register',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(formData),
+                    success: function(response) {
+                        // Show success message
+                        $('#successMessage').addClass('show');
+                        $('#registrationForm')[0].reset();
+                        $('#username, #password, #confirmPassword').removeClass('valid invalid');
+                        
+                        // Redirect to login page after 2 seconds
+                        setTimeout(function() {
+                            window.location.href = 'login.html';
+                        }, 2000);
+                    },
+                    error: function(xhr) {
+                        $('.btn-submit').prop('disabled', false).text('Register');
+                        
+                        let errorMessage = 'Registration failed. Please try again.';
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMessage = xhr.responseJSON.message;
+                        }
+                        
+                        alert(errorMessage);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
